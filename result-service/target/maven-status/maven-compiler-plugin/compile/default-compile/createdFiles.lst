@@ -1,0 +1,5 @@
+com\example\result\ResultServiceApplication.class
+com\example\result\controller\ResultController.class
+com\example\result\repository\ResultRepository.class
+com\example\result\model\Result.class
+com\example\result\service\ResultService.class
