@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master - Challenge Your Intellect</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(ellipse at center, #0a1628 0%, #020911 70%, #000000 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            color: white;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20% 30%, white, transparent),
+                radial-gradient(2px 2px at 60% 70%, white, transparent),
+                radial-gradient(1px 1px at 50% 50%, white, transparent),
+                radial-gradient(1px 1px at 80% 10%, white, transparent),
+                radial-gradient(2px 2px at 90% 60%, white, transparent),
+                radial-gradient(1px 1px at 33% 50%, white, transparent),
+                radial-gradient(1px 1px at 70% 30%, white, transparent);
+            background-size: 200% 200%, 200% 200%, 200% 200%, 200% 200%, 200% 200%, 200% 200%, 200% 200%;
+            background-position: 0% 0%, 40% 60%, 50% 50%, 80% 10%, 90% 60%, 33% 50%, 70% 30%;
+            background-repeat: repeat;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.6;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            background:
+                linear-gradient(0deg, transparent 0%, rgba(139, 69, 255, 0.3) 50%, transparent 100%),
+                repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 40px,
+                    rgba(139, 69, 255, 0.1) 40px,
+                    rgba(139, 69, 255, 0.1) 42px),
+                repeating-linear-gradient(90deg,
+                    transparent,
+                    transparent 40px,
+                    rgba(139, 69, 255, 0.1) 40px,
+                    rgba(139, 69, 255, 0.1) 42px);
+            transform: perspective(500px) rotateX(60deg);
+            transform-origin: bottom;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .timestamp {
+            position: fixed;
+            top: 16px;
+            right: 24px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.75rem;
+            color: #00d9ff;
+            z-index: 100;
+            letter-spacing: 0.5px;
+        }
+
+        .main-container {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            padding: 80px;
+            gap: 100px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content-left {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            animation: fadeInLeft 1s ease-out;
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .iso-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeInRight 1s ease-out;
+            perspective: 1200px;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+
+
+        .network-node {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: linear-gradient(135deg, #00ffff, #00d9ff);
+            border-radius: 50%;
+            box-shadow:
+                0 0 20px rgba(0, 255, 255, 1),
+                0 0 40px rgba(0, 255, 255, 0.8),
+                0 0 60px rgba(0, 217, 255, 0.6);
+            animation: nodeFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes nodeFloat {
+
+            0%,
+            100% {
+                transform: translateY(0px) scale(1);
+                opacity: 1;
+                box-shadow:
+                    0 0 20px rgba(0, 255, 255, 1),
+                    0 0 40px rgba(0, 255, 255, 0.8),
+                    0 0 60px rgba(0, 217, 255, 0.6);
+            }
+
+            50% {
+                transform: translateY(-20px) scale(1.4);
+                opacity: 0.9;
+                box-shadow:
+                    0 0 30px rgba(0, 255, 255, 1.5),
+                    0 0 60px rgba(0, 255, 255, 1.2),
+                    0 0 90px rgba(0, 217, 255, 0.9);
+            }
+        }
+
+        .node-1 {
+            top: -110px;
+            left: 50%;
+            margin-left: -4px;
+            animation-delay: 0s;
+        }
+
+        .node-2 {
+            top: 10%;
+            right: -140px;
+            animation-delay: 0.5s;
+        }
+
+        .node-3 {
+            top: 50%;
+            right: -160px;
+            animation-delay: 1s;
+        }
+
+        .node-4 {
+            bottom: 10%;
+            right: -140px;
+            animation-delay: 1.5s;
+        }
+
+        .node-5 {
+            bottom: -110px;
+            left: 50%;
+            margin-left: -4px;
+            animation-delay: 2s;
+        }
+
+        .node-6 {
+            bottom: 10%;
+            left: -140px;
+            animation-delay: 2.5s;
+        }
+
+        .node-7 {
+            top: 50%;
+            left: -160px;
+            animation-delay: 3s;
+        }
+
+        .node-8 {
+            top: 10%;
+            left: -140px;
+            animation-delay: 3.5s;
+        }
+
+
+
+
+
+        .glow-dot {
+            display: none;
+        }
+
+
+
+        .title-section {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .main-title {
+            font-size: clamp(3.5rem, 7vw, 5rem);
+            font-weight: 900;
+            color: white;
+            letter-spacing: 0.05em;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: #ecf0f1;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            line-height: 1.6;
+            max-width: 500px;
+        }
+
+        .cta-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b35, #ff8c42);
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 0;
+            padding: 16px 36px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.5);
+            clip-path: polygon(8% 0%, 100% 0%, 92% 100%, 0% 100%);
+            position: relative;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 107, 53, 0.7);
+            background: linear-gradient(135deg, #ff8c42, #ff6b35);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b46c1, #8b5cf6);
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 0;
+            padding: 16px 36px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5);
+            clip-path: polygon(8% 0%, 100% 0%, 92% 100%, 0% 100%);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.7);
+            background: linear-gradient(135deg, #8b5cf6, #6b46c1);
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                padding: 60px 40px;
+                gap: 60px;
+            }
+
+            .iso-container {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 40px 24px;
+            }
+
+            .main-title {
+                font-size: 3rem;
+            }
+
+            .cta-container {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .iso-container {
+                height: 300px;
+            }
+
+
+
+            .network-node {
+                width: 6px;
+                height: 6px;
+                margin-left: -3px;
+            }
+
+
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(38, 50, 56, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1f35, #0a0e1a);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, #ff00ff, #00ffff) 1;
+            border-radius: 16px;
+            padding: 48px 40px;
+            max-width: 480px;
+            width: 90vw;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 0, 255, 0.3);
+            position: relative;
+            animation: modalSlideIn 0.4s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-40px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            color: #00ffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #ff00ff;
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            background: rgba(10, 14, 26, 0.6);
+            color: white;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .modal-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+            background: rgba(10, 14, 26, 0.8);
+        }
+
+        .modal-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ff6b35, #ff8c42);
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 107, 53, 0.6);
+            background: linear-gradient(135deg, #ff8c42, #ff6b35);
+        }
+
+        .modal-switch {
+            text-align: center;
+            margin-top: 20px;
+            color: #ecf0f1;
+        }
+
+        .modal-switch a {
+            color: #00ffff;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-switch a:hover {
+            color: #ff00ff;
+            text-decoration: underline;
+        }
+
+        #error {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="timestamp" id="timestamp"></div>
+
+    <div class="main-container">
+        <div class="content-left">
+            <div class="title-section">
+                <h1 class="main-title">QUIZ MASTER</h1>
+                <p class="subtitle">Challenge Your Intellect.<br>Conquer Knowledge.</p>
+            </div>
+
+            <div class="cta-container">
+                <button class="btn-primary" onclick="openModal()">LOGIN</button>
+                <button class="btn-secondary" onclick="openSignupModal()">SIGNUP</button>
+            </div>
+        </div>
+
+        <div class="iso-container">
+            <!-- 3D Canvas will be injected here by js/landing-3d.js -->
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-bg">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h2 class="modal-title" id="modal-title">Sign In to Continue</h2>
+
+            <form id="login-form">
+                <input class="modal-input" type="text" id="login-username" placeholder="Username" required>
+                <input class="modal-input" type="password" id="login-password" placeholder="Password" required>
+                <button class="modal-btn" type="submit">Login</button>
+                <div class="modal-switch">
+                    Don't have an account? <a onclick="showRegister(); return false;">Register</a>
+                </div>
+            </form>
+
+            <form id="register-form" style="display:none;">
+                <input class="modal-input" type="text" id="register-username" placeholder="Username" required>
+                <input class="modal-input" type="email" id="register-email" placeholder="Email" required>
+                <input class="modal-input" type="password" id="register-password" placeholder="Password" required>
+                <button class="modal-btn" type="submit">Register</button>
+                <div class="modal-switch">
+                    Already have an account? <a onclick="showLogin(); return false;">Login</a>
+                </div>
+            </form>
+
+            <div id="error"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="js/landing-3d.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        function updateTimestamp() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+                timeZoneName: 'short'
+            };
+            document.getElementById('timestamp').textContent = now.toLocaleString('en-US', options);
+        }
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+
+        function openModal() {
+            document.getElementById('modal-bg').style.display = 'flex';
+            showLogin();
+        }
+
+        function openSignupModal() {
+            document.getElementById('modal-bg').style.display = 'flex';
+            showRegister();
+        }
+
+        function closeModal() {
+            document.getElementById('modal-bg').style.display = 'none';
+        }
+
+        document.getElementById('modal-bg').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        function showLogin() {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('modal-title').textContent = 'Sign In to Continue';
+        }
+
+        function showRegister() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+            document.getElementById('modal-title').textContent = 'Create New Account';
+        }
+    </script>
+</body>
+
+</html>
