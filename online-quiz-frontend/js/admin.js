@@ -45,8 +45,9 @@ async function fetchMyQuizzes() {
         const res = await fetch(`${window.API.questions.getById}/host/${username}`, { headers });
         if (!res.ok) {
             console.error('Failed to fetch quiz IDs. Status:', res.status);
-            if (res.status === 404) {
-                // 404 means no quizzes found for this user - that's OK
+            if (res.status === 404 || res.status === 400) {
+                // 404 or 400 means no quizzes found for this user - that's OK
+                console.log('No quizzes found for user:', username);
                 renderAdminQuizzes([]);
                 return;
             }
