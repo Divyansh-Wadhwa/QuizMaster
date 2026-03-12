@@ -1,0 +1,8 @@
+D:\Quiz-Application-main\auth-quiz-service\src\main\java\com\example\authquiz\controller\AuthController.java
+D:\Quiz-Application-main\auth-quiz-service\src\main\java\com\example\authquiz\config\WebConfig.java
+D:\Quiz-Application-main\auth-quiz-service\src\main\java\com\example\authquiz\service\StudentService.java
+D:\Quiz-Application-main\auth-quiz-service\src\main\java\com\example\authquiz\security\JwtUtil.java
+D:\Quiz-Application-main\auth-quiz-service\src\main\java\com\example\authquiz\model\Student.java
+D:\Quiz-Application-main\auth-quiz-service\src\main\java\com\example\authquiz\AuthQuizApplication.java
+D:\Quiz-Application-main\auth-quiz-service\src\main\java\com\example\authquiz\repository\StudentRepository.java
+D:\Quiz-Application-main\auth-quiz-service\src\main\java\com\example\authquiz\security\SecurityConfig.java
