@@ -155,6 +155,16 @@ All services connect to MongoDB at:
 - **URI:** `mongodb://localhost:27017/quiz_application`
 - **Database:** `quiz_application`
 
+## 🚀 Live Demo
+
+**Test it out:** https://quiz-master-lziv.vercel.app/
+
+### Deployed Services
+- **Frontend:** https://quiz-master-lziv.vercel.app/
+- **Auth Service:** https://quizmaster-auth.onrender.com/
+- **Question Bank:** https://quizmaster-0z97.onrender.com/
+- **Result Service:** https://quiz-result-service.onrender.com/
+
 ## Troubleshooting
 
 **MongoDB connection error:**
