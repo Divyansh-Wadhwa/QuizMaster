@@ -1,4 +1,3 @@
-const API_BASE = window.QUESTION_API_BASE;
 const token = localStorage.getItem("token");
 
 // Try to get quiz ID from localStorage first, then from URL parameter
@@ -44,7 +43,7 @@ async function loadQuestions() {
 
     // Check if user has already attempted this quiz
     try {
-        const attemptRes = await fetch(`${window.RESULT_API_BASE}/attempted/${quizId}/${studentUsername}`, { headers });
+        const attemptRes = await fetch(`${window.API.results.getQuizResults}/attempted/${quizId}/${studentUsername}`, { headers });
         if (attemptRes.ok) {
             const attempted = await attemptRes.json();
             if (attempted) {
@@ -58,7 +57,7 @@ async function loadQuestions() {
     } catch (e) { /* ignore, allow attempt if check fails */ }
 
     try {
-        const res = await fetch(`${API_BASE}/quiz/${quizId}`, { headers });
+        const res = await fetch(`${window.API.questions.getById}/${quizId}`, { headers });
         if (!res.ok) throw new Error("Failed to load questions");
         questions = await res.json();
         if (!questions || questions.length === 0) {
@@ -159,7 +158,7 @@ function showQuestion(index) {
                         studentUsername = tokenPayload.sub;
                     }
                 } catch (e) { }
-                const resultRes = await fetch(`${window.RESULT_API_BASE}/submit`, {
+                const resultRes = await fetch(window.API.results.submit, {
                     method: "POST",
                     headers,
                     body: JSON.stringify({

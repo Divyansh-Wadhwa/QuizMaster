@@ -1,12 +1,10 @@
-const API_BASE = window.AUTH_API_BASE;
-
 document.getElementById("login-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const username = document.getElementById("login-username").value;
     const password = document.getElementById("login-password").value;
 
     try {
-        const res = await fetch(`${API_BASE}/login`, {
+        const res = await fetch(window.API.auth.login, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password }),
@@ -32,7 +30,7 @@ document.getElementById("register-form").addEventListener("submit", async (e) =>
     const password = document.getElementById("register-password").value;
 
     try {
-        const res = await fetch(`${API_BASE}/register`, {
+        const res = await fetch(window.API.auth.register, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, email, password }),
