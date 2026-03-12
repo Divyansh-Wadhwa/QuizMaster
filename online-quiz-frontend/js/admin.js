@@ -1,6 +1,4 @@
 // admin.js
-const API_BASE = window.QUESTION_API_BASE;
-const RESULT_API = window.RESULT_API_BASE;
 const token = localStorage.getItem("token");
 let username = "";
 
@@ -44,7 +42,7 @@ async function fetchMyQuizzes() {
 
     try {
         // Try to get quizzes with metadata first
-        const metadataRes = await fetch(`${API_BASE}/host/${username}/detailed`, { headers });
+        const metadataRes = await fetch(`${window.API.questions.getById}/host/${username}/detailed`, { headers });
         if (metadataRes.ok) {
             const detailedQuizzes = await metadataRes.json();
             console.log('Detailed quizzes fetched:', detailedQuizzes); // Debug log
@@ -58,7 +56,7 @@ async function fetchMyQuizzes() {
     }
 
     // Fallback: Get quiz IDs and try to fetch quiz names
-    const res = await fetch(`${API_BASE}/host/${username}`, { headers });
+    const res = await fetch(`${window.API.questions.getById}/host/${username}`, { headers });
     if (!res.ok) {
         console.error('Failed to fetch quiz IDs. Status:', res.status);
         document.getElementById("admin-quiz-list").innerHTML = `
@@ -78,7 +76,7 @@ async function fetchMyQuizzes() {
         quizIds.map(async (quizId) => {
             try {
                 // Try to get quiz metadata
-                const quizRes = await fetch(`${API_BASE}/quiz/${quizId}/metadata`, { headers });
+                const quizRes = await fetch(`${window.API.questions.getById}/quiz/${quizId}/metadata`, { headers });
                 if (quizRes.ok) {
                     const metadata = await quizRes.json();
                     return {
@@ -94,7 +92,7 @@ async function fetchMyQuizzes() {
 
             // Try to get quiz name from first question
             try {
-                const questionsRes = await fetch(`${API_BASE}/quiz/${quizId}`, { headers });
+                const questionsRes = await fetch(`${window.API.questions.getById}/quiz/${quizId}`, { headers });
                 if (questionsRes.ok) {
                     const questions = await questionsRes.json();
                     console.log(`Questions for quiz ${quizId}:`, questions); // Debug log
@@ -272,15 +270,15 @@ window.editQuiz = function (quizId) {
 window.deleteQuiz = async function (quizId) {
     if (!confirm("Are you sure you want to delete this quiz and all its questions?")) return;
     // Fetch all questions for this quiz and delete them one by one
-    const res = await fetch(`${API_BASE}/quiz/${quizId}`, { headers });
+    const res = await fetch(`${window.API.questions.getById}/quiz/${quizId}`, { headers });
     const questions = await res.json();
     let success = true;
     for (const q of questions) {
-        const delRes = await fetch(`${API_BASE}/${q.id}`, { method: "DELETE", headers });
+        const delRes = await fetch(`${window.API.questions.getById}/${q.id}`, { method: "DELETE", headers });
         if (!delRes.ok) success = false;
     }
     // Delete all results for this quiz
-    const resultRes = await fetch(`${RESULT_API}/quiz/${quizId}`, { method: "DELETE", headers });
+    const resultRes = await fetch(`${window.API.results.getQuizResults}/quiz/${quizId}`, { method: "DELETE", headers });
     if (success && resultRes.ok) {
         alert("Quiz and all its results deleted.");
         fetchMyQuizzes();
@@ -328,7 +326,7 @@ window.viewParticipants = async function (quizId) {
     `;
 
     // Fetch all results for this quiz
-    const res = await fetch(`${RESULT_API}/quiz/${quizId}`, { headers });
+    const res = await fetch(`${window.API.results.getQuizResults}/quiz/${quizId}`, { headers });
     const participants = await res.json();
     const list = document.getElementById("participants-list");
     list.innerHTML = "";
@@ -396,7 +394,7 @@ window.viewParticipants = async function (quizId) {
 
         li.querySelector('.delete-user-result-btn').onclick = async function () {
             if (!confirm(`Delete result for user ${p.studentUsername}?`)) return;
-            const delRes = await fetch(`${RESULT_API}/quiz/${quizId}/user/${p.studentUsername}`, { method: "DELETE", headers });
+            const delRes = await fetch(`${window.API.results.getQuizResults}/quiz/${quizId}/user/${p.studentUsername}`, { method: "DELETE", headers });
             if (delRes.ok) {
                 li.remove();
                 alert("User's result deleted.");
@@ -422,7 +420,7 @@ function getQueryParam(name) {
 
 async function fetchQuizQuestions(quizId) {
     try {
-        const res = await fetch(`${API_BASE}/quiz/${quizId}`, { headers });
+        const res = await fetch(`${window.API.questions.getById}/quiz/${quizId}`, { headers });
         if (!res.ok) {
             throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
@@ -513,15 +511,15 @@ function renderQuizQuestions(quizId, questions) {
     deleteQuizBtn.onclick = async function () {
         if (!confirm("Are you sure you want to delete the entire quiz, all its questions, and all its results?")) return;
         // Delete all questions for this quiz
-        const res = await fetch(`${API_BASE}/quiz/${quizId}`);
+        const res = await fetch(`${window.API.questions.getById}/quiz/${quizId}`);
         const questions = await res.json();
         let success = true;
         for (const q of questions) {
-            const delRes = await fetch(`${API_BASE}/${q.id}`, { method: "DELETE", headers });
+            const delRes = await fetch(`${window.API.questions.getById}/${q.id}`, { method: "DELETE", headers });
             if (!delRes.ok) success = false;
         }
         // Delete all results for this quiz
-        const resultRes = await fetch(`${RESULT_API}/quiz/${quizId}`, { method: "DELETE", headers });
+        const resultRes = await fetch(`${window.API.results.getQuizResults}/quiz/${quizId}`, { method: "DELETE", headers });
         if (success && resultRes.ok) {
             alert("Quiz and all its results deleted.");
             window.location.href = "admin.html";
@@ -585,7 +583,7 @@ function renderQuizQuestions(quizId, questions) {
                 quizId,
                 quizName
             };
-            const res = await fetch(`${API_BASE}/add`, {
+            const res = await fetch(`${window.API.questions.add}`, {
                 method: "POST",
                 headers,
                 body: JSON.stringify(payload)
