@@ -1,15 +1,12 @@
 services:
   - type: web
     name: quiz-result-service
-    runtime: java
+    runtime: docker
     plan: free
-    buildCommand: "./mvnw clean package -DskipTests"
-    startCommand: "java -jar target/*.jar"
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: PORT
         value: 8082
-      - key: JAVA_OPTS
-        value: "-Xmx512m -Xms256m"
       - key: SPRING_DATA_MONGODB_URI
         sync: false
     healthCheck:
