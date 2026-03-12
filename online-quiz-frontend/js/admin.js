@@ -40,22 +40,7 @@ async function fetchMyQuizzes() {
 
     console.log('Fetching quizzes for user:', username); // Debug log
 
-    try {
-        // Try to get quizzes with metadata first
-        const metadataRes = await fetch(`${window.API.questions.getById}/host/${username}/detailed`, { headers });
-        if (metadataRes.ok) {
-            const detailedQuizzes = await metadataRes.json();
-            console.log('Detailed quizzes fetched:', detailedQuizzes); // Debug log
-            renderAdminQuizzes(detailedQuizzes);
-            return;
-        } else {
-            console.log('Detailed endpoint failed with status:', metadataRes.status); // Debug log
-        }
-    } catch (error) {
-        console.log('Detailed quiz endpoint not available, falling back to basic method:', error);
-    }
-
-    // Fallback: Get quiz IDs and try to fetch quiz names
+    // Get quiz IDs and try to fetch quiz names
     const res = await fetch(`${window.API.questions.getById}/host/${username}`, { headers });
     if (!res.ok) {
         console.error('Failed to fetch quiz IDs. Status:', res.status);
