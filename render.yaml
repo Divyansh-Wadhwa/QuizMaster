@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: quiz-auth-service
+    runtime: docker
+    plan: free
+    rootDir: auth-quiz-service
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: SPRING_DATA_MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+    healthCheck:
+      path: /api/auth/admin/users/count
+      initialDelaySeconds: 30
+      periodSeconds: 10
