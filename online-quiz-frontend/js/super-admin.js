@@ -1,7 +1,4 @@
 // super-admin.js
-const API_BASE = window.QUESTION_API_BASE;
-const AUTH_API = window.AUTH_API_BASE;
-const RESULT_API = window.RESULT_API_BASE;
 const token = localStorage.getItem("token");
 const currentUsername = localStorage.getItem("username");
 
@@ -207,7 +204,7 @@ async function loadDashboardData() {
 async function loadUserStats() {
     try {
         // Get actual user count from auth service
-        const response = await fetch(`${AUTH_API}/admin/users/count`, { headers });
+        const response = await fetch(`${window.API.auth.getUsers}/count`, { headers });
         if (response.ok) {
             const data = await response.json();
             console.log('User count data:', data);
@@ -226,14 +223,14 @@ async function loadUserStats() {
 async function loadQuizStats() {
     try {
         // Get all quizzes from question bank service
-        const response = await fetch(`${API_BASE}/quiz/all`, { headers });
+        const response = await fetch(`${window.API.questions.getAll}`, { headers });
         if (response.ok) {
             const quizzes = await response.json();
             return Array.isArray(quizzes) ? quizzes.length : 0;
         }
 
         // Fallback: try to get from regular quiz endpoint
-        const fallbackResponse = await fetch(`${API_BASE}/quiz/all`, { headers });
+        const fallbackResponse = await fetch(`${window.API.questions.getAll}`, { headers });
         if (fallbackResponse.ok) {
             const data = await fallbackResponse.json();
             return Array.isArray(data) ? data.length : 0;
@@ -251,7 +248,7 @@ async function loadUsers() {
     console.log('Loading users...');
     try {
         // Try to get all users from auth service
-        const response = await fetch(`${AUTH_API}/admin/users`, { headers });
+        const response = await fetch(`${window.API.auth.getUsers}`, { headers });
         if (response.ok) {
             const users = await response.json();
             // console.log('Users loaded from API:', users); // Reduced logging
@@ -431,7 +428,7 @@ async function loadQuizzes() {
 
     try {
         // The /quiz/all endpoint returns an array of quiz IDs (strings)
-        const response = await fetch(`${API_BASE}/quiz/all`, { headers });
+        const response = await fetch(`${window.API.questions.getAll}`, { headers });
         if (response.ok) {
             const quizIds = await response.json();
             console.log('Quiz IDs loaded from API:', quizIds);
@@ -448,7 +445,7 @@ async function loadQuizzes() {
 
                     try {
                         // Get quiz questions to extract metadata
-                        const questionsResponse = await fetch(`${API_BASE}/quiz/${quizId}`, { headers });
+                        const questionsResponse = await fetch(`${window.API.questions.getById}/${quizId}`, { headers });
                         let quizData = {
                             id: quizId,
                             title: `Quiz ${quizId}`,
@@ -490,7 +487,7 @@ async function loadQuizzes() {
 
                         // Try to get participant count from results service
                         try {
-                            const resultsResponse = await fetch(`${RESULT_API}/quiz/${quizId}`, { headers });
+                            const resultsResponse = await fetch(`${window.API.results.getQuizResults}/${quizId}`, { headers });
                             if (resultsResponse.ok) {
                                 const results = await resultsResponse.json();
                                 quizData.participants = Array.isArray(results) ? results.length : 0;
@@ -620,7 +617,7 @@ function renderQuizzesTable(quizzes) {
 async function loadLogs() {
     try {
         // Try to get activity logs from auth service
-        const response = await fetch(`${AUTH_API}/admin/logs`, { headers });
+        const response = await fetch(`${window.API.auth.getUsers}/logs`, { headers });
         if (response.ok) {
             const logs = await response.json();
             if (Array.isArray(logs)) {
@@ -655,7 +652,7 @@ async function loadLogs() {
 
         // Add result submission logs
         try {
-            const resultResponse = await fetch(`${RESULT_API}/admin/results/recent`, { headers });
+            const resultResponse = await fetch(`${window.API.results.getQuizResults}/admin/results/recent`, { headers });
             if (resultResponse.ok) {
                 const results = await resultResponse.json();
                 if (Array.isArray(results)) {
@@ -829,7 +826,7 @@ async function editUser(userId) {
         console.log('Editing user with ID:', userId);
 
         // Fetch user data from the API
-        const response = await fetch(`${AUTH_API}/admin/users/${userId}`, { headers });
+        const response = await fetch(`${window.API.auth.getUsers}/${userId}`, { headers });
 
         if (response.ok) {
             const userData = await response.json();
@@ -892,7 +889,7 @@ async function deleteUser(userId, username) {
 
     if (confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
         try {
-            const response = await fetch(`${AUTH_API}/admin/users/${userId}`, {
+            const response = await fetch(`${window.API.auth.getUsers}/${userId}`, {
                 method: 'DELETE',
                 headers
             });
@@ -923,7 +920,7 @@ async function toggleUserBlock(userId, username, isCurrentlyBlocked) {
     const action = isCurrentlyBlocked ? 'unblock' : 'block';
     if (confirm(`Are you sure you want to ${action} user "${username}"?`)) {
         try {
-            const response = await fetch(`${AUTH_API}/admin/users/${userId}/toggle-status`, {
+            const response = await fetch(`${window.API.auth.getUsers}/${userId}/toggle-status`, {
                 method: 'PUT',
                 headers
             });
@@ -948,7 +945,7 @@ async function toggleUserBlock(userId, username, isCurrentlyBlocked) {
 async function promoteToAdmin(userId, username) {
     if (confirm(`Are you sure you want to promote "${username}" to Administrator? This will grant them full system access.`)) {
         try {
-            const response = await fetch(`${AUTH_API}/admin/users/${userId}/promote`, {
+            const response = await fetch(`${window.API.auth.getUsers}/${userId}/promote`, {
                 method: 'PUT',
                 headers
             });
@@ -983,7 +980,7 @@ async function demoteFromAdmin(userId, username) {
 
     if (confirm(`Are you sure you want to remove Administrator privileges from "${username}"? They will become a regular user.`)) {
         try {
-            const response = await fetch(`${AUTH_API}/admin/users/${userId}/demote`, {
+            const response = await fetch(`${window.API.auth.getUsers}/${userId}/demote`, {
                 method: 'PUT',
                 headers
             });
@@ -1012,7 +1009,7 @@ async function demoteFromAdmin(userId, username) {
 
 async function toggleUserStatus(userId) {
     try {
-        const response = await fetch(`${AUTH_API}/admin/users/${userId}/toggle-status`, {
+        const response = await fetch(`${window.API.auth.getUsers}/${userId}/toggle-status`, {
             method: 'PUT',
             headers
         });
@@ -1105,7 +1102,7 @@ async function createQuiz() {
 
     try {
         // Create the placeholder question to establish the quiz
-        const response = await fetch(`${API_BASE}/add`, {
+        const response = await fetch(`${window.API.questions.add}`, {
             method: 'POST',
             headers: {
                 ...headers,
@@ -1167,7 +1164,7 @@ async function updateQuiz() {
 
     try {
         // Get all questions for this quiz first
-        const questionsResponse = await fetch(`${API_BASE}/quiz/${quizId}`, { headers });
+        const questionsResponse = await fetch(`${window.API.questions.getById}/${quizId}`, { headers });
         if (!questionsResponse.ok) {
             showNotification('Quiz not found', 'error');
             return;
@@ -1194,7 +1191,7 @@ async function updateQuiz() {
                     // These would need to be added to the model if we want to persist them
                 };
 
-                const updateResponse = await fetch(`${API_BASE}/${question.id}`, {
+                const updateResponse = await fetch(`${window.API.questions.getById}/${question.id}`, {
                     method: 'PUT',
                     headers: {
                         ...headers,
@@ -1262,7 +1259,7 @@ async function deleteQuiz(quizId) {
     if (confirm(confirmMessage)) {
         try {
             // Use the correct delete endpoint from the QuestionController
-            const response = await fetch(`${API_BASE}/quiz/${quizId}`, {
+            const response = await fetch(`${window.API.questions.getById}/quiz/${quizId}`, {
                 method: 'DELETE',
                 headers
             });
@@ -1290,7 +1287,7 @@ async function deleteQuiz(quizId) {
 
 async function viewQuestion(questionId) {
     try {
-        const response = await fetch(`${API_BASE}/admin/questions/${questionId}`, { headers });
+        const response = await fetch(`${window.API.questions.getById}/admin/questions/${questionId}`, { headers });
         if (response.ok) {
             const question = await response.json();
             alert(`Question: ${question.questionText || question.text}\n\nOptions:\n${(question.options || []).join('\n')}\n\nCorrect Answer: ${question.correctAnswer || 'Not specified'}`);
@@ -1305,7 +1302,7 @@ async function viewQuestion(questionId) {
 
 async function editQuestion(questionId) {
     try {
-        const response = await fetch(`${API_BASE}/admin/questions/${questionId}`, { headers });
+        const response = await fetch(`${window.API.questions.getById}/admin/questions/${questionId}`, { headers });
         if (response.ok) {
             const question = await response.json();
             console.log('Question to edit:', question);
@@ -1323,7 +1320,7 @@ async function editQuestion(questionId) {
 async function deleteQuestion(questionId) {
     if (confirm('Are you sure you want to delete this question? This action cannot be undone.')) {
         try {
-            const response = await fetch(`${API_BASE}/admin/questions/${questionId}`, {
+            const response = await fetch(`${window.API.questions.getById}/admin/questions/${questionId}`, {
                 method: 'DELETE',
                 headers
             });
@@ -1352,9 +1349,9 @@ async function exportReports() {
 
         // Get all data for export
         const [users, quizzes, results] = await Promise.all([
-            fetch(`${AUTH_API}/admin/users`, { headers }).then(r => r.ok ? r.json() : []).catch(() => []),
-            fetch(`${API_BASE}/quiz/all`, { headers }).then(r => r.ok ? r.json() : []).catch(() => []),
-            fetch(`${RESULT_API}/admin/results/all`, { headers }).then(r => r.ok ? r.json() : []).catch(() => [])
+            fetch(`${window.API.auth.getUsers}`, { headers }).then(r => r.ok ? r.json() : []).catch(() => []),
+            fetch(`${window.API.questions.getAll}`, { headers }).then(r => r.ok ? r.json() : []).catch(() => []),
+            fetch(`${window.API.results.getQuizResults}/admin/results/all`, { headers }).then(r => r.ok ? r.json() : []).catch(() => [])
         ]);
 
         // Create CSV content
@@ -1576,7 +1573,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.log('Password field empty - keeping existing password');
                 }
 
-                const response = await fetch(`${AUTH_API}/admin/users/${userId}`, {
+                const response = await fetch(`${window.API.auth.getUsers}/${userId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

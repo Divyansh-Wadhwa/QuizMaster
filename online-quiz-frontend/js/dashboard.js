@@ -34,8 +34,6 @@ function joinQuizById() {
     localStorage.setItem("currentQuizId", quizId);
     window.location.href = "quiz.html";
 }
-const API_BASE = window.QUESTION_API_BASE;
-
 const token = localStorage.getItem("token");
 if (!token) {
     window.location.href = "index.html";
@@ -48,7 +46,7 @@ const headers = {
 
 async function fetchQuizzes() {
     try {
-        const res = await fetch(`${API_BASE}/quiz/all`, { headers });
+        const res = await fetch(`${window.API.questions.getAll}`, { headers });
         if (!res.ok) throw new Error("Failed to fetch quizzes");
 
         const quizzes = await res.json();
@@ -112,7 +110,7 @@ function logout() {
 
     if (username) {
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${API_BASE}/logout`, false);
+        xhr.open('POST', `${window.API.auth.login}`, false);
         xhr.setRequestHeader('Content-Type', 'application/json');
         try {
             const payload = JSON.stringify({ username: username });
