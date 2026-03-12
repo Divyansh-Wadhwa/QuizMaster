@@ -14,7 +14,7 @@ function generateQuizId() {
 // Function to check if quiz ID already exists
 async function isQuizIdUnique(quizId) {
     try {
-        const response = await fetch(`${window.QUESTION_API_BASE}/quiz/${quizId}`);
+        const response = await fetch(`${window.API.questions.getById}/${quizId}`);
         // If quiz exists, response will be ok (200), so ID is not unique
         // If quiz doesn't exist, response will be 404 or error, so ID is unique
         return !response.ok;
@@ -245,7 +245,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             for (const q of questions) {
                 try {
-                    const res = await fetch(`${window.QUESTION_API_BASE}/add`, {
+                    const res = await fetch(`${window.API.questions.add}`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",

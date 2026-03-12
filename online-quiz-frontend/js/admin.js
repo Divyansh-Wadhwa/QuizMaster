@@ -40,83 +40,104 @@ async function fetchMyQuizzes() {
 
     console.log('Fetching quizzes for user:', username); // Debug log
 
-    // Get quiz IDs and try to fetch quiz names
-    const res = await fetch(`${window.API.questions.getById}/host/${username}`, { headers });
-    if (!res.ok) {
-        console.error('Failed to fetch quiz IDs. Status:', res.status);
-        document.getElementById("admin-quiz-list").innerHTML = `
-            <div style="text-align: center; color: #ff6b6b; padding: 20px;">
-                <p>Failed to fetch quizzes. Status: ${res.status}</p>
-                <p>Please check if you're logged in properly.</p>
-            </div>
-        `;
-        return;
-    }
-    const quizIds = await res.json();
-
-    console.log('Quiz IDs fetched:', quizIds); // Debug log
-
-    // Try to get quiz names for each quiz ID
-    const quizzesWithNames = await Promise.all(
-        quizIds.map(async (quizId) => {
-            try {
-                // Try to get quiz metadata
-                const quizRes = await fetch(`${window.API.questions.getById}/quiz/${quizId}/metadata`, { headers });
-                if (quizRes.ok) {
-                    const metadata = await quizRes.json();
-                    return {
-                        quizId: quizId,
-                        quizName: metadata.quizName || metadata.name || 'Untitled Quiz',
-                        questionCount: metadata.questionCount || 0,
-                        createdAt: metadata.createdAt || null
-                    };
-                }
-            } catch (error) {
-                console.log(`Could not fetch metadata for quiz ${quizId}`);
+    try {
+        // Get quiz IDs by host username
+        const res = await fetch(`${window.API.questions.getById}/host/${username}`, { headers });
+        if (!res.ok) {
+            console.error('Failed to fetch quiz IDs. Status:', res.status);
+            if (res.status === 404) {
+                // 404 means no quizzes found for this user - that's OK
+                renderAdminQuizzes([]);
+                return;
             }
+            document.getElementById("admin-quiz-list").innerHTML = `
+                <div style="text-align: center; color: #ff6b6b; padding: 20px;">
+                    <p>Failed to fetch quizzes. Status: ${res.status}</p>
+                    <p>Please check if you're logged in properly.</p>
+                </div>
+            `;
+            return;
+        }
+        const quizIds = await res.json();
 
-            // Try to get quiz name from first question
-            try {
-                const questionsRes = await fetch(`${window.API.questions.getById}/quiz/${quizId}`, { headers });
-                if (questionsRes.ok) {
-                    const questions = await questionsRes.json();
-                    console.log(`Questions for quiz ${quizId}:`, questions); // Debug log
+        console.log('Quiz IDs fetched:', quizIds); // Debug log
 
-                    let quizName = 'Untitled Quiz';
+        if (!quizIds || quizIds.length === 0) {
+            // No quizzes found - render empty state
+            renderAdminQuizzes([]);
+            return;
+        }
 
-                    // Check if any question has a quizName field
-                    if (questions.length > 0) {
-                        // Try to get quizName from the first question that has it
-                        for (const question of questions) {
-                            if (question.quizName && question.quizName.trim()) {
-                                quizName = question.quizName;
-                                break;
+        // Try to get quiz names for each quiz ID
+        const quizzesWithNames = await Promise.all(
+            quizIds.map(async (quizId) => {
+                try {
+                    // Try to get quiz metadata
+                    const quizRes = await fetch(`${window.API.questions.getById}/quiz/${quizId}/metadata`, { headers });
+                    if (quizRes.ok) {
+                        const metadata = await quizRes.json();
+                        return {
+                            quizId: quizId,
+                            quizName: metadata.quizName || metadata.name || 'Untitled Quiz',
+                            questionCount: metadata.questionCount || 0,
+                            createdAt: metadata.createdAt || null
+                        };
+                    }
+                } catch (error) {
+                    console.log(`Could not fetch metadata for quiz ${quizId}`);
+                }
+
+                // Try to get quiz name from first question
+                try {
+                    const questionsRes = await fetch(`${window.API.questions.getById}/quiz/${quizId}`, { headers });
+                    if (questionsRes.ok) {
+                        const questions = await questionsRes.json();
+                        console.log(`Questions for quiz ${quizId}:`, questions); // Debug log
+
+                        let quizName = 'Untitled Quiz';
+
+                        // Check if any question has a quizName field
+                        if (questions.length > 0) {
+                            // Try to get quizName from the first question that has it
+                            for (const question of questions) {
+                                if (question.quizName && question.quizName.trim()) {
+                                    quizName = question.quizName;
+                                    break;
+                                }
                             }
                         }
+
+                        return {
+                            quizId: quizId,
+                            quizName: quizName,
+                            questionCount: questions.length,
+                            createdAt: null
+                        };
                     }
-
-                    return {
-                        quizId: quizId,
-                        quizName: quizName,
-                        questionCount: questions.length,
-                        createdAt: null
-                    };
+                } catch (error) {
+                    console.log(`Could not fetch questions for quiz ${quizId}`, error);
                 }
-            } catch (error) {
-                console.log(`Could not fetch questions for quiz ${quizId}`, error);
-            }
 
-            // Fallback: return just the quiz ID
-            return {
-                quizId: quizId,
-                quizName: 'Untitled Quiz',
-                questionCount: 0,
-                createdAt: null
-            };
-        })
-    );
+                // Fallback: return just the quiz ID
+                return {
+                    quizId: quizId,
+                    quizName: 'Untitled Quiz',
+                    questionCount: 0,
+                    createdAt: null
+                };
+            })
+        );
 
-    renderAdminQuizzes(quizzesWithNames);
+        renderAdminQuizzes(quizzesWithNames);
+    } catch (error) {
+        console.error('Error fetching quizzes:', error);
+        document.getElementById("admin-quiz-list").innerHTML = `
+            <div style="text-align: center; color: #ff6b6b; padding: 20px;">
+                <p>Error fetching quizzes: ${error.message}</p>
+                <p>Please try again later.</p>
+            </div>
+        `;
+    }
 }
 
 function renderAdminQuizzes(quizzes) {
