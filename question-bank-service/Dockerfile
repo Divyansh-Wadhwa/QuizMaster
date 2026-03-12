@@ -21,4 +21,4 @@ RUN mvn clean package -DskipTests
 EXPOSE 8081
 
 # Run the application
-CMD ["java", "-jar", "target/*.jar"]
+CMD ["java", "-jar", "target/question-bank-service-1.0.0.jar"]

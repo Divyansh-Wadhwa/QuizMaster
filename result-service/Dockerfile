@@ -21,4 +21,4 @@ RUN mvn clean package -DskipTests
 EXPOSE 8082
 
 # Run the application
-CMD ["java", "-jar", "target/*.jar"]
+CMD ["java", "-jar", "target/result-service-1.0.0.jar"]
