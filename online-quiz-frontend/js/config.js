@@ -17,7 +17,7 @@ if (isDevelopment) {
 } else {
     // Production URLs - Replace with your deployed service URLs
     AUTH_API_BASE = window.PRODUCTION_AUTH_API || 'https://quiz-auth-service.onrender.com/api/auth';
-    QUESTION_API_BASE = window.PRODUCTION_QUESTION_API || 'https://quiz-question-service.onrender.com/api/questions';
+    QUESTION_API_BASE = window.PRODUCTION_QUESTION_API || 'https://quizmaster-0z97.onrender.com/api/questions';
     RESULT_API_BASE = window.PRODUCTION_RESULT_API || 'https://quiz-result-service.onrender.com/api/results';
     console.log('🚀 Running in PRODUCTION mode');
     console.log('Auth API:', AUTH_API_BASE);
